@@ -1,4 +1,4 @@
-const { src, dest, parallel } = require('gulp');
+const { src, dest, parallel, watch } = require('gulp');
 const sass = require('gulp-sass')(require('sass'));
 const pug = require('gulp-pug');
 const browserSync = require('browser-sync').create();
@@ -28,7 +28,10 @@ const buildPug = () => {
   console.log('Компиляция Pug');
 
   return src('src/pages/*.pug')
-    .pipe(pug())
+    .pipe(pug({
+      pretty: true,
+      basedir: __dirname
+    }))
     .pipe(dest('build/'))
     .pipe(browserSync.stream());
 }
