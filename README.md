@@ -13,3 +13,7 @@
   <li>Normalize CSS</li>
 </ul>
 
+
+<p>Images are automatically optimized for the web and transferred to the 'build' folder</p>
+
+
