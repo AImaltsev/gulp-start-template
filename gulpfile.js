@@ -1,9 +1,11 @@
-const { src, dest, parallel, watch } = require('gulp');
+const { src, dest, parallel, watch, series } = require('gulp');
 const sass = require('gulp-sass')(require('sass'));
 const pug = require('gulp-pug');
 const browserSync = require('browser-sync').create();
 const watchFiles = require('gulp-watch');
 const concat = require('gulp-concat');
+const cleanCSS = require('gulp-clean-css');
+const rename = require('gulp-rename');
 
 // Функция запуска сервера
 const browserSyncJob = async () => {
@@ -25,11 +27,13 @@ const buildSass = () => {
   console.log('Компиляция SASS');
 
   return src(['node_modules/normalize.css/normalize.css', 'src/sass/*.scss'])
-    .pipe(concat('app.css'))
     .pipe(sass())
+    .pipe(concat('app.css')) // Объединяем все CSS в один файл
+    .pipe(cleanCSS())
     .pipe(dest('build/styles/'))
     .pipe(browserSync.stream());
 };
+
 
 // Компилятор PUG
 const buildPug = () => {
@@ -53,10 +57,15 @@ const optimizeImages = async () => {
     .pipe(dest('build/images/', { base: 'src/images/' }));
 };
 
-// Отслеживание изменений в изображениях
-const watchImages = () => {
-  watchFiles('src/images/**/*', optimizeImages);
+
+// Копирование normalize.css в папку build/styles
+const copyNormalize = () => {
+  return src('node_modules/normalize.css/normalize.css')
+    .pipe(rename('normalize.min.css'))
+    .pipe(dest('build/styles/'));
 };
 
+
 exports.server = browserSyncJob; // Сервер
-exports.build = parallel(buildPug, buildSass, optimizeImages); // Компиляторы
+exports.build = series(copyNormalize, parallel(buildPug, buildSass, optimizeImages)); // Компиляторы и копирование normalize.css
+
