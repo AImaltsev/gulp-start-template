@@ -29,7 +29,7 @@ const buildSass = () => {
   return src(['node_modules/normalize.css/normalize.css', 'src/sass/*.scss'])
     .pipe(sass())
     .pipe(concat('app.css')) // Объединяем все CSS в один файл
-    .pipe(cleanCSS())
+    .pipe(cleanCSS({ format: 'keep-breaks' }))
     .pipe(dest('build/styles/'))
     .pipe(browserSync.stream());
 };
